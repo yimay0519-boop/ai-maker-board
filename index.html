@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 創客共學群討論版</title>
+    <!-- 引入 Tailwind CSS 快速美化 UI -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            background-color: #f8fafc;
+        }
+        /* 滾動條美化 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="text-gray-800 font-sans min-h-screen flex flex-col">
+
+    <!-- 導覽列 -->
+    <header class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg p-4 sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <span class="text-3xl">🤖</span>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-wide">AI 創客共學群討論版</h1>
+                    <p class="text-xs text-blue-200 hidden md:block">每一次的聚會，都是智慧的火花撞擊</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="text-xs bg-blue-500/50 border border-blue-400 px-3 py-1 rounded-full text-white font-medium backdrop-blur-xs">
+                    GitHub Pages 靜態版
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要內容區 -->
+    <main class="container mx-auto my-6 px-4 flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- 左側：會議資訊管理區 (占 1 欄) -->
+        <section class="lg:col-span-1 space-y-6">
+            <!-- 新增會議表單 -->
+            <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-100">
+                <h2 class="text-lg font-bold mb-4 text-blue-600 flex items-center gap-2">
+                    <span>➕ 新增會議資訊</span>
+                </h2>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">會議主題</label>
+                        <input type="text" id="meetTitle" placeholder="例如：第二次 AI 創客同學會" class="w-full p-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">會議日期</label>
+                        <input type="date" id="meetDate" class="w-full p-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">地點 / 線上連結</label>
+                        <input type="text" id="meetLocation" placeholder="例如：Google Meet / 教室 302" class="w-full p-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">參考資訊與學習資源</label>
+                        <textarea id="meetInfo" placeholder="請輸入本次聚會的討論大綱、講義或參考連結..." class="w-full p-2.5 text-sm border border-gray-200 rounded-xl h-28 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all resize-none"></textarea>
+                    </div>
+                    <button onclick="addMeeting()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition shadow-xs cursor-pointer">
+                        發布會議公告
+                    </button>
+                </div>
+            </div>
+
+            <!-- 歷次會議公告清單 -->
+            <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-100">
+                <h2 class="text-lg font-bold mb-4 text-gray-700 flex items-center justify-between">
+                    <span>📅 歷次會議公告</span>
+                    <span id="meetCount" class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-normal">0</span>
+                </h2>
+                <div id="meetingList" class="space-y-4 max-h-[450px] overflow-y-auto pr-1">
+                    <!-- 會議清單動態渲染 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 右側：互動問答區 (占 2 欄) -->
+        <section class="lg:col-span-2 space-y-6">
+            <!-- 提問表單 -->
+            <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-100">
+                <h2 class="text-lg font-bold mb-4 text-emerald-600 flex items-center gap-2">
+                    <span>🙋‍♂️ 我要發問 / 交流想法</span>
+                </h2>
+                <div class="space-y-3">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <div class="md:col-span-1">
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">暱稱</label>
+                            <input type="text" id="qAuthor" placeholder="例如：阿明" class="w-full p-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all">
+                        </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">關聯會議（選填）</label>
+                            <select id="qTag" class="w-full p-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all bg-white">
+                                <option value="一般討論">💡 一般交流討論</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">問題或想法內容</label>
+                        <textarea id="qContent" placeholder="請詳細描述您在 AI 專案實作中遇到的瓶頸，或想與大家分享的技術、工具..." class="w-full p-2.5 text-sm border border-gray-200 rounded-xl h-28 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all resize-none"></textarea>
+                    </div>
+                    <div class="flex justify-end">
+                        <button onclick="addQuestion()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-2.5 rounded-xl transition shadow-xs cursor-pointer">
+                            提交討論主題
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 問題列表 -->
+            <div class="space-y-4">
+                <h2 class="text-lg font-bold text-gray-700 flex items-center justify-between">
+                    <span class="flex items-center gap-2">💬 社群互動討論區</span>
+                    <span id="qCount" class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-normal">0</span>
+                </h2>
+                <div id="questionList" class="space-y-4">
+                    <!-- 問題與回答清單動態渲染 -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="bg-slate-800 text-slate-400 text-center py-4 text-xs mt-12 border-t border-slate-700">
+        <p>© 2026 AI 創客共學群. 資料將安全儲存於您的瀏覽器本地快取 (LocalStorage) 中。</p>
+    </footer>
+
+    <!-- 核心 JavaScript 處理 LocalStorage 靜態運作 -->
+    <script>
+        // 初始化預設資料（若 LocalStorage 為空時載入）
+        const defaultMeetings = [
+            { id: 1690000000001, title: "🚀 創客群創立聚會：LLM 應用與 RAG 落地實務", date: "2026-07-15", location: "線上 Google Meet 研討室", info: "討論大綱：\n1. 大語言模型 API 串接心法\n2. 知識庫檢索增強生成 (RAG) 基礎架構\n\n參考資源：\n- OpenAI API Documentation\n- LangChain 官方開源框架" }
+        ];
+
+        const defaultQuestions = [
+            { 
+                id: 1690000000002, 
+                author: "小明", 
+                tag: "🚀 創客群創立聚會：LLM 應用與 RAG 落地實務",
+                content: "請問在實作 RAG 系統時，選擇 Embedding 向量模型有什麼推薦的評估指標嗎？中文文本處理哪一個效果比較好？", 
+                time: "2026-07-15 15:30",
+                answers: [
+                    { replier: "隊長威宇", text: "建議可以參考 MTEB (Massive Text Embedding Benchmark) 的中文排行榜！目前 BGE 繁中優化版或是 OpenAI 的 text-embedding-3-large 表現都很穩定，主要看預算以及是否需要落地私有化。", time: "2026-07-15 16:10" }
+                ] 
+            }
+        ];
+
+        // 從 LocalStorage 讀取或載入預設
+        let meetings = JSON.parse(localStorage.getItem('ai_maker_meetings')) || defaultMeetings;
+        let questions = JSON.parse(localStorage.getItem('ai_maker_questions')) || defaultQuestions;
+
+        // 儲存資料回 LocalStorage
+        function saveData() {
+            localStorage.setItem('ai_maker_meetings', JSON.stringify(meetings));
+            localStorage.setItem('ai_maker_questions', JSON.stringify(questions));
+            renderAll();
+        }
+
+        // 格式化時間
+        function getNowFormatDate() {
+            const date = new Date();
+            const separator = "-";
+            const year = date.getFullYear();
+            let month = date.getMonth() + 1;
+            let strDate = date.getDate();
+            let hour = date.getHours();
+            let minute = date.getMinutes();
+            if (month >= 1 && month <= 9) month = "0" + month;
+            if (strDate >= 0 && strDate <= 9) strDate = "0" + strDate;
+            if (hour >= 0 && hour <= 9) hour = "0" + hour;
+            if (minute >= 0 && minute <= 9) minute = "0" + minute;
+            return year + separator + month + separator + strDate + " " + hour + ":" + minute;
+        }
+
+        // 轉換多行文字防護 XSS
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        // 渲染所有元件
+        function renderAll() {
+            renderMeetings();
+            renderQuestions();
+            updateTagDropdown();
+        }
+
+        // 1. 渲染會議清單
+        function renderMeetings() {
+            const list = document.getElementById('meetingList');
+            document.getElementById('meetCount').innerText = meetings.length;
+
+            if (meetings.length === 0) {
+                list.innerHTML = `<p class="text-sm text-gray-400 italic text-center py-6">目前暫無會議公告，請由上方新增。</p>`;
+                return;
+            }
+
+            // 依日期排序（新到舊）
+            const sortedMeetings = [...meetings].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            list.innerHTML = sortedMeetings.map(m => `
+                <div class="p-4 bg-slate-50 rounded-xl border-l-4 border-blue-500 hover:bg-slate-100/70 transition relative group">
+                    <button onclick="deleteMeeting(${m.id})" class="absolute top-3 right-3 text-gray-300 hover:text-rose-500 text-xs hidden group-hover:block transition cursor-pointer" title="刪除此會議">
+                        🗑️ 刪除
+                    </button>
+                    <h3 class="font-bold text-sm md:text-base text-gray-800">${escapeHtml(m.title)}</h3>
+                    <div class="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-500 mt-1">
+                        <span>📅 ${m.date}</span>
+                        <span>📍 ${escapeHtml(m.location || '未定')}</span>
+                    </div>
+                    <p class="text-xs mt-2 text-gray-600 bg-white p-2.5 rounded-lg border border-gray-100 whitespace-pre-line leading-relaxed">${escapeHtml(m.info || '無詳細參考資訊。')}</p>
+                </div>
+            `).join('');
+        }
+
+        // 更新問答表單的關聯會議下拉選單
+        function updateTagDropdown() {
+            const select = document.getElementById('qTag');
+            const savedValue = select.value;
+            
+            let options = `<option value="一般討論">💡 一般交流討論</option>`;
+            meetings.forEach(m => {
+                options += `<option value="${escapeHtml(m.title)}">📅 ${escapeHtml(m.title)}</option>`;
+            });
+            select.innerHTML = options;
+            
+            // 盡可能還原先前的選取值
+            if (options.includes(savedValue)) {
+                select.value = savedValue;
+            }
+        }
+
+        // 2. 渲染問題區
+        function renderQuestions() {
+            const list = document.getElementById('questionList');
+            document.getElementById('qCount').innerText = questions.length;
+
+            if (questions.length === 0) {
+                list.innerHTML = `
+                    <div class="bg-white p-8 rounded-2xl text-center border border-dashed border-gray-200">
+                        <p class="text-gray-400 text-sm">目前討論區空空如也... 快來拋出你的第一個 AI 問題吧！</p>
+                    </div>`;
+                return;
+            }
+
+            // 最新提問在最上面
+            const sortedQuestions = [...questions].sort((a, b) => b.id - a.id);
+
+            list.innerHTML = sortedQuestions.map(q => {
+                const answersHtml = q.answers.map(ans => `
+                    <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-3xs text-sm">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-semibold text-xs text-slate-700 bg-slate-100 px-2 py-0.5 rounded-sm">💡 ${escapeHtml(ans.replier)}</span>
+                            <span class="text-[10px] text-gray-400">${ans.time || ''}</span>
+                        </div>
+                        <p class="text-gray-700 leading-relaxed pl-1">${escapeHtml(ans.text)}</p>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-100 space-y-4 relative group">
+                        <button onclick="deleteQuestion(${q.id})" class="absolute top-4 right-4 text-gray-300 hover:text-rose-500 text-xs hidden group-hover:block transition cursor-pointer" title="刪除此討論">
+                            🗑️ 刪除主題
+                        </button>
+                        <div>
+                            <div class="flex flex-wrap gap-2 items-center">
+                                <span class="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full font-semibold">
+                                    👤 ${escapeHtml(q.author)}
+                                </span>
+                                <span class="text-[11px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md max-w-[200px] truncate" title="${escapeHtml(q.tag || '一般討論')}">
+                                    🏷️ ${escapeHtml(q.tag || '一般討論')}
+                                </span>
+                                <span class="text-[10px] text-gray-400 ml-auto">${q.time || ''}</span>
+                            </div>
+                            <p class="text-sm md:text-base font-semibold mt-3 text-gray-800 leading-snug pl-1">
+                                ${escapeHtml(q.content)}
+                            </p>
+                        </div>
+                        
+                        <!-- 回答區塊容器 -->
+                        <div class="bg-slate-50 p-4 rounded-xl space-y-2.5">
+                            <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                                <span>社群迴響 (${q.answers.length})</span>
+                            </h4>
+                            <div class="space-y-2 max-h-[300px] overflow-y-auto">
+                                ${answersHtml || '<p class="text-xs text-gray-400 italic pl-1 py-1">目前尚無人回應，邀請你共享智慧！</p>'}
+                            </div>
+                        </div>
+
+                        <!-- 快速回覆輸入框 -->
+                        <div class="flex gap-2 pt-1">
+                            <input type="text" id="replier-${q.id}" placeholder="暱稱" class="w-20 md:w-28 p-2 text-xs border border-gray-200 rounded-xl focus:outline-none focus:border-slate-500">
+                            <input type="text" id="ans-${q.id}" placeholder="寫下你的解惑思路或觀點..." class="flex-1 p-2 text-xs border border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500">
+                            <button onclick="addAnswer(${q.id})" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 text-xs rounded-xl font-medium transition shrink-0 cursor-pointer">
+                                回應
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 3. 操作動作函數
+        function addMeeting() {
+            const title = document.getElementById('meetTitle').value.trim();
+            const date = document.getElementById('meetDate').value;
+            const location = document.getElementById('meetLocation').value.trim();
+            const info = document.getElementById('meetInfo').value.trim();
+
+            if (!title || !date) {
+                alert('💡 請務必填寫「會議主題」與「會議日期」唷！');
+                return;
+            }
+
+            const newMeeting = { id: Date.now(), title, date, location, info };
+            meetings.push(newMeeting);
+            
+            // 表單清空
+            document.getElementById('meetTitle').value = '';
+            document.getElementById('meetDate').value = '';
+            document.getElementById('meetLocation').value = '';
+            document.getElementById('meetInfo').value = '';
+            
+            saveData();
+        }
+
+        function deleteMeeting(id) {
+            if (confirm('確定要刪除這場會議公告嗎？(這不會影響已發布的討論串)')) {
+                meetings = meetings.filter(m => m.id !== id);
+                saveData();
+            }
+        }
+
+        function addQuestion() {
+            const author = document.getElementById('qAuthor').value.trim() || '匿名創客';
+            const tag = document.getElementById('qTag').value;
+            const content = document.getElementById('qContent').value.trim();
+
+            if (!content) {
+                alert('💡 請寫下您想提問或探討的內容！');
+                return;
+            }
+
+            const newQuestion = {
+                id: Date.now(),
+                author,
+                tag,
+                content,
+                time: getNowFormatDate(),
+                answers: []
+            };
+
+            questions.push(newQuestion);
+            document.getElementById('qContent').value = '';
+            saveData();
+        }
+
+        function deleteQuestion(id) {
+            if (confirm('確定要刪除這個討論主題及其所有回答嗎？')) {
+                questions = questions.filter(q => q.id !== id);
+                saveData();
+            }
+        }
+
+        function addAnswer(qId) {
+            const replierInput = document.getElementById(`replier-${qId}`);
+            const ansInput = document.getElementById(`ans-${qId}`);
+            
+            const replier = replierInput.value.trim() || '熱心夥伴';
+            const text = ansInput.value.trim();
+
+            if (!text) {
+                alert('💡 請輸入回應的內容！');
+                return;
+            }
+
+            const question = questions.find(q => q.id === qId);
+            if (question) {
+                question.answers.push({
+                    replier,
+                    text,
+                    time: getNowFormatDate()
+                });
+                
+                ansInput.value = '';
+                // 留著 replier 暱稱方便連續留言
+                saveData();
+            }
+        }
+
+        // 頁面初次載入
+        renderAll();
+    </script>
+</body>
+</html>
