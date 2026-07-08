@@ -51,7 +51,7 @@
 
         // 🛠️ 請將下方的大括號內容，替換成你在 Firebase 後台申請到的專屬 Config 金鑰！
         const firebaseConfig = {
-            apiKey: "AIzaSyDARs5DMzi8muL-QHL5hVwCpzvRIt5Q4ZU",
+             apiKey: "AIzaSyDARs5DMzi8muL-QHL5hVwCpzvRIt5Q4ZU",
   authDomain: "ai-maker-board.firebaseapp.com",
   databaseURL: "https://ai-maker-board-default-rtdb.firebaseio.com",
   projectId: "ai-maker-board",
@@ -61,9 +61,9 @@
   measurementId: "G-CW0BXKPBL3"
         };
 
-        // 初始化 Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+       // Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
         // 定義資料庫路徑參考
         const meetingsRef = ref(db, 'meetings');
